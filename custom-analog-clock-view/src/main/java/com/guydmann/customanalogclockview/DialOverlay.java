@@ -1,4 +1,4 @@
-package com.tomerrosenfeld.customanalogclockview;
+package com.guydmann.customanalogclockview;
 
 
 

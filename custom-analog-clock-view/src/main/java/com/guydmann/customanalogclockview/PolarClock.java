@@ -1,4 +1,4 @@
-package com.tomerrosenfeld.customanalogclockview;
+package com.guydmann.customanalogclockview;
 
 
 import android.content.Context;
@@ -6,8 +6,10 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -17,17 +19,15 @@ import java.util.TimeZone;
 
 
 /**
- * A widget that displays the time as a 12-at-the-top 24 hour analog clock. By
+ * A widget that displays the time as a 12-at-the-top 24 hour polar clock. By
  * default, it will show the current time in the current timezone. The displayed
  * time can be set using {@link #setTime(long)} and and
  * {@link #setTimezone(TimeZone)}.
  *
- * @author <a href="mailto:steve@staticfree.info">Steve Pomeroy</a>
+ * @author <a href="mailto:guydmann@guydmann.com">Steve Pomeroy</a>
  */
-public class CustomAnalogClock extends View {
+public class PolarClock extends View {
 
-    public static boolean is24;
-    public static boolean hourOnTop;
     private final ArrayList<DialOverlay> mDialOverlay = new ArrayList<DialOverlay>();
     AttributeSet attributeSet;
     int defStyle;
@@ -43,19 +43,19 @@ public class CustomAnalogClock extends View {
     private HandsOverlay mHandsOverlay;
     private boolean autoUpdate;
 
-    public CustomAnalogClock(Context context, AttributeSet attrs, int defStyle) {
+    public PolarClock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init(context, R.drawable.default_face, R.drawable.default_hour_hand, R.drawable.default_minute_hand, 0, false, false);
+        init(context, R.drawable.default_face, 0);
     }
 
-    public CustomAnalogClock(Context context, AttributeSet attrs) {
+    public PolarClock(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, R.drawable.default_face, R.drawable.default_hour_hand, R.drawable.default_minute_hand, 0, false, false);
+        init(context, R.drawable.default_face, 0);
     }
 
-    public CustomAnalogClock(Context context) {
+    public PolarClock(Context context) {
         super(context);
-        init(context, R.drawable.default_face, R.drawable.default_hour_hand, R.drawable.default_minute_hand, 0, false, false);
+        init(context, R.drawable.default_face, 0);
     }
 
 
@@ -64,25 +64,14 @@ public class CustomAnalogClock extends View {
         setFace(r.getDrawable(drawableRes));
     }
 
-    public void init(Context context, @DrawableRes int watchFace, @DrawableRes int hourHand, @DrawableRes int minuteHand, int alpha, boolean is24, boolean hourOnTop) {
-        CustomAnalogClock.is24 = is24;
-        final TypedArray attrs = context.obtainStyledAttributes(attributeSet, R.styleable.CustomAnalogClock, defStyle, 0);
-        Drawable face = attrs.getDrawable(R.styleable.CustomAnalogClock_face);
-        Drawable Hhand = attrs.getDrawable(R.styleable.CustomAnalogClock_hour_hand);
-        Drawable Mhand = attrs.getDrawable(R.styleable.CustomAnalogClock_minute_hand);
-
-        CustomAnalogClock.hourOnTop = hourOnTop;
+    public void init(Context context, @DrawableRes int watchFace, int alpha) {
+        final TypedArray attrs = context.obtainStyledAttributes(attributeSet, R.styleable.PolarClock, defStyle, 0);
+        Drawable face = attrs.getDrawable(R.styleable.PolarClock_face);
         setFace(watchFace);
-        Hhand = context.getResources().getDrawable(hourHand);
-        assert Hhand != null;
-        if (alpha > 0)
-            Hhand.setAlpha(alpha);
-
-        Mhand = context.getResources().getDrawable(minuteHand);
 
         mCalendar = Calendar.getInstance();
 
-        mHandsOverlay = new HandsOverlay(Hhand, Mhand);
+        mHandsOverlay = new HandsOverlay();
     }
 
     public void setFace(Drawable face) {
@@ -120,7 +109,7 @@ public class CustomAnalogClock extends View {
                 public void run() {
                     setTime(Calendar.getInstance());
                 }
-            }, 5000);
+            }, 100);
         }
     }
 
@@ -150,6 +139,7 @@ public class CustomAnalogClock extends View {
     }
 
     // some parts from AnalogClock.java
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -176,12 +166,14 @@ public class CustomAnalogClock extends View {
             canvas.scale(scale, scale, cX, cY);
         }
 
+        /*
         if (sizeChanged) {
             mFace.setBounds(cX - (w / 2), cY - (h / 2), cX + (w / 2), cY
                     + (h / 2));
         }
 
         mFace.draw(canvas);
+        */
 
         for (final DialOverlay overlay : mDialOverlay) {
             overlay.onDraw(canvas, cX, cY, w, h, mCalendar, sizeChanged);

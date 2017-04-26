@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="CustomAnalogClock">
+    <declare-styleable name="PolarClock">
         <attr name="face" format="reference" />
+        <attr name="month_hand" format="reference" />
+        <attr name="day_of_month_hand" format="reference" />
+        <attr name="day_of_week_hand" format="reference" />
+        <attr name="second_hand" format="reference" />
         <attr name="minute_hand" format="reference" />
         <attr name="hour_hand" format="reference" />
     </declare-styleable>

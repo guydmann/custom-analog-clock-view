@@ -1,4 +1,4 @@
-package com.tomerrosenfeld.analogclockview;
+package com.guydmann.analogclockview;
 
 import org.junit.Test;
 
