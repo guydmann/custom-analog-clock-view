@@ -109,7 +109,7 @@ public class PolarClock extends View {
                 public void run() {
                     setTime(Calendar.getInstance());
                 }
-            }, 100);
+            }, 20);
         }
     }
 
@@ -165,15 +165,6 @@ public class PolarClock extends View {
             canvas.save();
             canvas.scale(scale, scale, cX, cY);
         }
-
-        /*
-        if (sizeChanged) {
-            mFace.setBounds(cX - (w / 2), cY - (h / 2), cX + (w / 2), cY
-                    + (h / 2));
-        }
-
-        mFace.draw(canvas);
-        */
 
         for (final DialOverlay overlay : mDialOverlay) {
             overlay.onDraw(canvas, cX, cY, w, h, mCalendar, sizeChanged);

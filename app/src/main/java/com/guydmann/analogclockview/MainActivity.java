@@ -12,7 +12,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        PolarClock polarClock = (PolarClock) findViewById(R.id.analog_clock);
+        PolarClock polarClock = (PolarClock) findViewById(R.id.polar_clock);
         polarClock.setAutoUpdate(true);
     }
 }

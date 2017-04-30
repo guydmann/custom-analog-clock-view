@@ -24,8 +24,12 @@ public class HandsOverlay implements DialOverlay {
     private float mMinRot;
     private float mSecRot;
     private boolean mShowSeconds;
-    private int mIncrement;
+    private int mWidthIncrement;
+    private int mHeightIncrement;
     private String timeText;
+    private boolean hourFlyBack;
+    private boolean minuteFlyBack;
+    private boolean secondFlyBack;
 
     static float HALF_PI = (float) (Math.PI/2);
     static float TWO_PI = (float) (Math.PI*2);
@@ -34,26 +38,18 @@ public class HandsOverlay implements DialOverlay {
         final Resources r = context.getResources();
 
         mUseLargeFace = useLargeFace;
+        hourFlyBack = false;
+        minuteFlyBack = false;
+        secondFlyBack = false;
+
 
     }
 
     public HandsOverlay() {
         mUseLargeFace = false;
-    }
-
-    /*
-    public HandsOverlay(Context context, int hourHandRes, int minuteHandRes) {
-        final Resources r = context.getResources();
-
-        mUseLargeFace = false;
-
-        mHour = r.getDrawable(hourHandRes);
-        mMinute = r.getDrawable(minuteHandRes);
-    }
-    */
-
-    public static float getHourHandAngle(int h, int m) {
-        return ((12 + h) / 12.0f * 360) % 360 + (m / 60.0f) * 360 / 12.0f;
+        hourFlyBack = false;
+        minuteFlyBack = false;
+        secondFlyBack = false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -62,10 +58,18 @@ public class HandsOverlay implements DialOverlay {
                        boolean sizeChanged) {
         updateHands(calendar);
         canvas.save();
-        mIncrement = w/10;
-        drawHours(canvas, cX, cY, w-(mIncrement*5), h-(mIncrement*5));
-        drawMinutes(canvas, cX, cY, w-(mIncrement*3), h-(mIncrement*3));
-        drawSeconds(canvas, cX, cY, w-mIncrement, h-mIncrement);
+        mWidthIncrement = w/10;
+        mHeightIncrement = h/10;
+        int hourWidth = w-(mWidthIncrement*5);
+        int hourHeight = h-(mHeightIncrement*5);
+        int minuteWidth = w-(mWidthIncrement*3);
+        int minuteHeight = h-(mHeightIncrement*3);
+        int secondWidth = w-(mWidthIncrement);
+        int secondHeight = h-(mHeightIncrement);
+
+        drawHours(canvas, cX, cY, hourWidth , hourHeight);
+        drawMinutes(canvas, cX, cY, minuteWidth, minuteHeight);
+        drawSeconds(canvas, cX, cY, secondWidth, secondHeight);
         //drawDayOfWeek(canvas, cX, cY, w, h, calendar, sizeChanged);
         //drawDayOfMonth(canvas, cX, cY, w, h, calendar, sizeChanged);
         //drawMonth(canvas, cX, cY, w, h, calendar, sizeChanged);
@@ -73,6 +77,10 @@ public class HandsOverlay implements DialOverlay {
         canvas.restore();
     }
 
+    private void drawFlyBack(Canvas canvas, int cX, int cY, int w, int h ) {
+        canvas.save();
+
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void drawHours(Canvas canvas, int cX, int cY, int w, int h) {
@@ -94,7 +102,7 @@ public class HandsOverlay implements DialOverlay {
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setStrokeWidth((float) (mIncrement*1.25));
+        paint.setStrokeWidth((float) (mWidthIncrement*1.25));
         paint.setColor(Color.HSVToColor(new float[]{rotation, 1, 1}));
 
         final RectF oval = new RectF();
@@ -150,11 +158,26 @@ public class HandsOverlay implements DialOverlay {
         final int h = calendar.get(Calendar.HOUR_OF_DAY);
         final int m = calendar.get(Calendar.MINUTE);
         final int s = calendar.get(Calendar.SECOND);
+        final int ms = calendar.get(Calendar.MILLISECOND);
 
-        mSecRot = (s  * 6);
+        if (s>0) {
+            mSecRot = (s * 6);
+        } else {
+            mSecRot = ((1000 - ms)/1000.0f)*360;
+        }
 
-        mMinRot = (m * 6) + (mShowSeconds ? (s / 60.0f) : 0) ;
-        mHourRot = (((h / 12.0f) * 360) % 360) + (m / 2.0f);
+        if (m == 0 && s == 0) {
+            mMinRot = ((1000 - ms)/1000.0f)*360;
+        } else {
+            mMinRot = (m * 6) + (mShowSeconds ? (s / 60.0f) : 0) ;
+        }
+
+        if (h == 0 && m == 0 && s == 0) {
+            mHourRot = ((1000 - ms)/1000.0f)*360;
+        } else {
+            mHourRot = (((h / 12.0f) * 360) % 360) + (m / 2.0f);
+        }
+
 
         timeText = String.format("%d:%02d:%02d %s", h%12, m, s, (ampm == 1? "PM" : "AM" ) );
 
