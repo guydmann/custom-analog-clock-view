@@ -21,7 +21,7 @@ import java.util.TimeZone;
 /**
  * A widget that displays the time as a 12-at-the-top 24 hour polar clock. By
  * default, it will show the current time in the current timezone. The displayed
- * time can be set using {@link #setTime(long)} and and
+ * time can be set using {@link #setTime(long)} and
  * {@link #setTimezone(TimeZone)}.
  *
  * @author <a href="mailto:guydmann@guydmann.com">Steve Pomeroy</a>
@@ -71,7 +71,7 @@ public class PolarClock extends View {
 
         mCalendar = Calendar.getInstance();
 
-        mHandsOverlay = new HandsOverlay();
+        mHandsOverlay = new HandsOverlay(true);
     }
 
     public void setFace(Drawable face) {
@@ -127,9 +127,6 @@ public class PolarClock extends View {
         mCalendar = Calendar.getInstance(timezone);
     }
 
-    public void setHandsOverlay(HandsOverlay handsOverlay) {
-        mHandsOverlay = handsOverlay;
-    }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -224,19 +221,6 @@ public class PolarClock extends View {
         mLeft = left;
         mTop = top;
         mBottom = bottom;
-    }
-
-
-    public void addDialOverlay(DialOverlay dialOverlay) {
-        mDialOverlay.add(dialOverlay);
-    }
-
-    public void removeDialOverlay(DialOverlay dialOverlay) {
-        mDialOverlay.remove(dialOverlay);
-    }
-
-    public void clearDialOverlays() {
-        mDialOverlay.clear();
     }
 }
 

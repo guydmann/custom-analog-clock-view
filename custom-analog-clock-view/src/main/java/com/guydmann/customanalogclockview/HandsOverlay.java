@@ -18,8 +18,6 @@ import java.util.Calendar;
 
 
 public class HandsOverlay implements DialOverlay {
-
-    private final boolean mUseLargeFace;
     private float mHourRot;
     private float mMinRot;
     private float mSecRot;
@@ -27,29 +25,9 @@ public class HandsOverlay implements DialOverlay {
     private int mWidthIncrement;
     private int mHeightIncrement;
     private String timeText;
-    private boolean hourFlyBack;
-    private boolean minuteFlyBack;
-    private boolean secondFlyBack;
 
-    static float HALF_PI = (float) (Math.PI/2);
-    static float TWO_PI = (float) (Math.PI*2);
-
-    public HandsOverlay(Context context, boolean useLargeFace) {
-        final Resources r = context.getResources();
-
-        mUseLargeFace = useLargeFace;
-        hourFlyBack = false;
-        minuteFlyBack = false;
-        secondFlyBack = false;
-
-
-    }
-
-    public HandsOverlay() {
-        mUseLargeFace = false;
-        hourFlyBack = false;
-        minuteFlyBack = false;
-        secondFlyBack = false;
+    public HandsOverlay(boolean showSeconds) {
+        mShowSeconds = showSeconds;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -69,17 +47,11 @@ public class HandsOverlay implements DialOverlay {
 
         drawHours(canvas, cX, cY, hourWidth , hourHeight);
         drawMinutes(canvas, cX, cY, minuteWidth, minuteHeight);
-        drawSeconds(canvas, cX, cY, secondWidth, secondHeight);
-        //drawDayOfWeek(canvas, cX, cY, w, h, calendar, sizeChanged);
-        //drawDayOfMonth(canvas, cX, cY, w, h, calendar, sizeChanged);
-        //drawMonth(canvas, cX, cY, w, h, calendar, sizeChanged);
+        if (mShowSeconds) {
+            drawSeconds(canvas, cX, cY, secondWidth, secondHeight);
+        }
         drawTimeText(canvas, cX, cY, w, h);
         canvas.restore();
-    }
-
-    private void drawFlyBack(Canvas canvas, int cX, int cY, int w, int h ) {
-        canvas.save();
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -136,7 +108,6 @@ public class HandsOverlay implements DialOverlay {
         // Set the paint for that size.
         paint.setTextSize(desiredTextSize);
 
-
         canvas.drawText(timeText, cX-(r / 4), cY, paint);
     }
 
@@ -148,22 +119,18 @@ public class HandsOverlay implements DialOverlay {
 
 
     private void updateHands(Calendar calendar) {
-
-        /*
-        final int mn = calendar.get(Calendar.MONTH);
-        final int dom = calendar.get(Calendar.DAY_OF_MONTH);
-        final int dow = calendar.get(Calendar.DAY_OF_WEEK);
-        */
         final int ampm = calendar.get(Calendar.AM_PM);
         final int h = calendar.get(Calendar.HOUR_OF_DAY);
         final int m = calendar.get(Calendar.MINUTE);
         final int s = calendar.get(Calendar.SECOND);
         final int ms = calendar.get(Calendar.MILLISECOND);
 
-        if (s>0) {
-            mSecRot = (s * 6);
-        } else {
-            mSecRot = ((1000 - ms)/1000.0f)*360;
+        if (mShowSeconds) {
+            if (s > 0) {
+                mSecRot = (s * 6);
+            } else {
+                mSecRot = ((1000 - ms) / 1000.0f) * 360;
+            }
         }
 
         if (m == 0 && s == 0) {
